@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+version 'unspecified'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version:'2.27'
+    compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version:'2.27'
+    compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.1.1'
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    compile group: 'javax.activation', name: 'activation', version: '1.1.1'
+}

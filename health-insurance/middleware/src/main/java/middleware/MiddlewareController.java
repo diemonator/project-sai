@@ -7,14 +7,16 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
 import model.HospitalCostsReply;
 import model.HospitalCostsRequest;
-import model.TreatmentCostsReply;
 import model.TreatmentCostsRequest;
+import service.TreatmentCostsService;
 
-import javax.jms.JMSException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class MiddlewareController implements Initializable {
+
+    @FXML
+    public ListView<ListViewLine> lvListViewLines;
 
     private ClientAppGateway clientAppGateway = new ClientAppGateway() {
         @Override
@@ -34,13 +36,13 @@ public class MiddlewareController implements Initializable {
             if (line != null) {
                 line.setHospitalCostsReply(reply);
                 lvListViewLines.refresh();
-                clientAppGateway.sendHospitalRequest(line.getTreatmentCostsRequest(),new TreatmentCostsReply(reply.getPrice(),line.getTreatmentCostsRequest().getTransportDistance(),reply.getHospitalName()));
+                model.TreatmentCostsReply treatmentCostsReply = new model.TreatmentCostsReply(reply.getPrice(), line.getTreatmentCostsRequest().getTransportDistance(), reply.getHospitalName());
+                if (treatmentCostsReply.getTransportPrice() > 0)
+                    treatmentCostsReply = new TreatmentCostsService().connectToTransportCostService(treatmentCostsReply);
+                clientAppGateway.sendHospitalRequest(line.getTreatmentCostsRequest(), treatmentCostsReply);
             }
         }
     };
-
-    @FXML
-    public ListView<ListViewLine> lvListViewLines;
 
     /**
      * This method returns the line of lvMessages which contains the given loan request.

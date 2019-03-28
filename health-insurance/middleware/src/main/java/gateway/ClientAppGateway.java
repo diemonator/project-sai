@@ -52,9 +52,6 @@ public abstract class ClientAppGateway {
      * @param reply receives reply parameter from GUI
      */
     public void sendHospitalRequest(TreatmentCostsRequest request, TreatmentCostsReply reply) {
-        if (reply.getTransportPrice() > 0) {
-            reply = connectToTransportCostService(reply);
-        }
         String id = map.get(request);
         String json = TreatmentCostsSerializer.treatmentCostsReplyToJson(reply);
         Message message = sender.createTextMessage(json);
@@ -66,21 +63,4 @@ public abstract class ClientAppGateway {
         sender.send(message);
     }
 
-    /**
-     * Method gets the recipient transport
-     * @param reply gets the treatment costs reply object with a transport price > than 0
-     * @return TreatmentCostsReply object with the modified transport price
-     */
-    private TreatmentCostsReply connectToTransportCostService(TreatmentCostsReply reply) {
-        URI baseUri = UriBuilder.fromUri("http://localhost:8080/transportprice/rest/price").build();
-        Client client = ClientBuilder.newClient(new ClientConfig());
-        WebTarget target = client.target(baseUri);
-        Invocation.Builder requestBuilder = target.request().accept(MediaType.TEXT_PLAIN);
-        Response response = requestBuilder.get();
-        if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-            double entity = response.readEntity(double.class);
-            reply.setTransportPrice(reply.getTransportPrice() * entity);
-        }
-        return reply;
-    }
 }
